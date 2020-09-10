@@ -1,4 +1,3 @@
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,12 +13,15 @@ public class Runner {
         List<String> keywords = new ArrayList<>();
         keywords.add("java");
 
-        if(input_site.equals("sql.ru")){
-            Parser parser = new ParserSQLru();
-            parser.load(1);
+        Parser parser = new ParserSQLru();
+
+        if (input_site.equals("sql.ru")) {
+            parser.load(input_months);
             parser.process(keywords);
             parser.save();
         }
+
+
 
     }
 }
