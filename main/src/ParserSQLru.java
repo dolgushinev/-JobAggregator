@@ -3,6 +3,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -14,13 +15,14 @@ import util.ParserUtil;
 public class ParserSQLru implements Parser {
 
     private List<Vacancy> vacancies = new ArrayList<>();
+    private List<Vacancy> filteredVacancies = new ArrayList<>();
 
     final String URL = "https://www.sql.ru/forum/job-offers/";
 
     @Override
     public boolean load(int months) {
 
-        System.out.println("loading...");
+        System.out.println("Загрузка данных...");
         Document doc = null;
 
         try {
@@ -70,9 +72,9 @@ public class ParserSQLru implements Parser {
                 doc = Jsoup.connect(URL + String.valueOf(i)).get();
             }
 
-            for (Vacancy vacancy : vacancies) {
+/*            for (Vacancy vacancy : vacancies) {
                 System.out.println(vacancy.getTitle() + " " + vacancy.getUrl() + " " + vacancy.getcDate() + " " + vacancy.getDescription());
-            }
+            }*/
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -132,9 +134,16 @@ public class ParserSQLru implements Parser {
     }
 
     @Override
-    public boolean process(List<String> keywords) {
+    public boolean process(String[] keywords) {
         System.out.println("processing...");
-        return false;
+
+        filteredVacancies = vacancies.stream().filter(v -> v.containsKeyword(keywords)).collect(Collectors.toList());
+
+        for (Vacancy vacancy : filteredVacancies) {
+                System.out.println(vacancy.getTitle() + " " + vacancy.getUrl() + " " + vacancy.getcDate() + " " + vacancy.getDescription());
+            }
+
+        return true;
     }
 
     @Override

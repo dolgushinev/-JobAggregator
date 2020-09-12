@@ -3,8 +3,6 @@ import java.util.List;
 
 public interface Parser {
     boolean load(int months);
-
-    boolean process(List<String> keywords);
-
+    boolean process(String[] keywords);
     boolean save();
 }
