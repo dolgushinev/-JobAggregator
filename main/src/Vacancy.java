@@ -1,12 +1,20 @@
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Vacancy {
     private String title;
     private String description;
+    private LocalDateTime cDate;
+    private String url; //подумать над типом данных URL
+
+    @Override
+    public String toString() {
+        return  "Дата публикации=" + cDate +
+                ", Заголовок='" + title + '\'' +
+                ", URL='" + url + '\'' +
+                ", Описание='" + description + '\'';
+    }
 
     public String getTitle() {
         return title;
@@ -35,9 +43,6 @@ public class Vacancy {
 
         return false;
     }
-
-    private LocalDateTime cDate;
-    private String url; //подумать над типом данных URL
 
     public Vacancy(String title, String description, LocalDateTime cDate, String url) {
         this.title = title;

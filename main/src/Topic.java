@@ -1,7 +1,3 @@
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import util.ParserUtil;
-import java.io.IOException;
 import java.time.LocalDateTime;
 
 public class Topic {

@@ -1,4 +1,8 @@
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -140,7 +144,7 @@ public class ParserSQLru implements Parser {
         filteredVacancies = vacancies.stream().filter(v -> v.containsKeyword(keywords)).collect(Collectors.toList());
 
         for (Vacancy vacancy : filteredVacancies) {
-                System.out.println(vacancy.getTitle() + " " + vacancy.getUrl() + " " + vacancy.getcDate() + " " + vacancy.getDescription());
+                System.out.println(vacancy.toString());
             }
 
         return true;
@@ -149,6 +153,15 @@ public class ParserSQLru implements Parser {
     @Override
     public boolean save() {
         System.out.println("save results...");
-        return false;
+
+        List<String> lines = filteredVacancies.stream().map(v -> v.toString()).collect(Collectors.toList());
+        Path result = Paths.get("result.txt");
+        try {
+            Files.write(result, lines, Charset.forName("UTF-8"));
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
