@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.*;
 import java.util.stream.Collectors;
 
 import org.jsoup.Jsoup;
@@ -18,40 +19,73 @@ import util.ParserUtil;
 
 public class ParserSQLru implements Parser {
 
-    private List<Vacancy> vacancies = new ArrayList<>();
-    private List<Vacancy> filteredVacancies = new ArrayList<>();
+    private List<Vacancy> vacancies;
+    private List<Vacancy> filteredVacancies;
+    private static Logger logger;
 
-    final String URL = "https://www.sql.ru/forum/job-offers/";
+    final String baseURL = "https://www.sql.ru/forum/job-offers/";
+
+    public ParserSQLru() {
+        vacancies = new ArrayList<>();
+        filteredVacancies = new ArrayList<>();
+
+        try {
+            LogManager.getLogManager().readConfiguration(ParserSQLru.class.getResourceAsStream("/logging.properties"));
+        } catch (IOException e) {
+            System.err.println("Не смог загрузить файл конфигурации для логера: " + e.toString());
+        }
+
+        logger = Logger.getLogger(ParserSQLru.class.getName());
+
+        FileHandler handler = null;
+        try {
+            handler = new FileHandler("./LogFile.log");
+        } catch (IOException e) {
+            System.out.println("Проверьте, что есть доступ к файловой системе");
+        }
+        logger.addHandler(handler);
+
+        SimpleFormatter formatter = new SimpleFormatter();
+        handler.setFormatter(formatter);
+
+    }
 
     @Override
     public boolean load(int months) {
 
         System.out.println("Загрузка данных...");
+        logger.log(Level.FINE, "Загрузка данных...");
+
         Document doc = null;
 
         try {
 
             int i = 1;
 
-            System.out.println("Загружаем: " + URL + String.valueOf(i));
-            doc = Jsoup.connect(URL + String.valueOf(i)).get();
+            String pageURL = baseURL + String.valueOf(i);
+            System.out.println("Загружаем: " + pageURL);
+            doc = Jsoup.connect(baseURL + String.valueOf(i)).get();
+
+            logger.log(Level.FINE, "Загружены данные по странице: " + baseURL + String.valueOf(i));
 
             while (!isLastPage(doc, months)) {
 
                 Elements rows = doc.getElementsByTag("table").get(2).
                         getElementsByTag("tr");
 
-                for (int j = 4; j < rows.size();
-                     j++) {
+                int index = getFirstTopicIndex(rows);
 
-                    Element currentRow = rows.get(j);
+                for (; index < rows.size();
+                     index++) {
 
-                    String datetime = currentRow.
+                    Element currentRow = rows.get(index);
+
+                    String modifiedDate = currentRow.
                             getElementsByTag("td").
                             last().
                             text();
 
-                    Topic topic = new Topic(ParserUtil.getDate(datetime), getURL(currentRow));
+                    Topic topic = new Topic(ParserUtil.getDate(modifiedDate), getURL(currentRow));
 
                     boolean isClosed = isClosed(currentRow);
 
@@ -61,30 +95,33 @@ public class ParserSQLru implements Parser {
                         vacancyDoc = Jsoup.connect(topic.getUrl()).get();
                     } catch (IOException e) {
                         e.printStackTrace();
+                        logger.log(Level.SEVERE, "При загрузке данных топика возникла ошибка");
                     }
 
-                    String cDateTime = vacancyDoc.getElementsByClass("msgFooter").get(0).text().split("\\[")[0];
+                    String createdDate = vacancyDoc.getElementsByClass("msgFooter").get(0).text().split("\\[")[0];
 
 
-                    if (ParserUtil.getDate(cDateTime).isAfter(LocalDateTime.now().minusMonths(months)) && !isClosed) {
-                        vacancies.add(new Vacancy(getTitle(vacancyDoc), getDescription(vacancyDoc), ParserUtil.getDate(cDateTime), topic.getUrl()));
+                    if (ParserUtil.getDate(createdDate).isAfter(LocalDateTime.now().minusMonths(months)) && !isClosed) {
+                        vacancies.add(new Vacancy(getTitle(vacancyDoc), getDescription(vacancyDoc), ParserUtil.getDate(createdDate), topic.getUrl()));
                     }
                 }
 
                 i++;
-                System.out.println("Загружаем: " + URL + String.valueOf(i));
-                doc = Jsoup.connect(URL + String.valueOf(i)).get();
-            }
 
-/*            for (Vacancy vacancy : vacancies) {
-                System.out.println(vacancy.getTitle() + " " + vacancy.getUrl() + " " + vacancy.getcDate() + " " + vacancy.getDescription());
-            }*/
+                pageURL = baseURL + String.valueOf(i);
+                System.out.println("Загружаем: " + pageURL);
+                doc = Jsoup.connect(pageURL).get();
+                logger.log(Level.FINE, "Загружены данные по странице: " + baseURL + String.valueOf(i));
+
+            }
 
         } catch (IOException e) {
             e.printStackTrace();
+            logger.log(Level.SEVERE, "При загрузке данных возникла ошибка");
             return false;
         }
 
+        logger.log(Level.FINE, "Загрузка данных успешно завершена");
         return true;
     }
 
@@ -108,59 +145,69 @@ public class ParserSQLru implements Parser {
 
     private boolean isLastPage(Document doc, int months) {
 
-        //Подумать над тем как пропустить "важные объявления", сейчас хардкод, берем 4-ю строку
-        String date = doc.getElementsByTag("table").
+        Elements rows = doc.getElementsByTag("table").
                 get(2).
-                getElementsByTag("tr").
-                get(4).
+                getElementsByTag("tr");
+
+        int index = getFirstTopicIndex(rows);
+
+        String date = rows.
+                get(index).
                 getElementsByTag("td").
                 last().
                 text();
 
-        //подумать над тем, чтобы использовать метод getDate;
+        LocalDateTime modifiedDate = ParserUtil.getDate(date);
 
-        String[] s_date = date.split(",")[0].split(" ");
+        boolean isLastPage = modifiedDate.isBefore(LocalDateTime.now().minusMonths(months));
 
-        //System.out.println(date);
+        if(isLastPage) logger.log(Level.FINE, "Все необходимые страницы загружены");
 
-        if (s_date[0].equals("сегодня") || s_date[0].equals("вчера")) {
-            return false;
+        return isLastPage;
+    }
+
+    private int getFirstTopicIndex(Elements rows) {
+        int index = 0;
+
+        for (index = 1; index < rows.size(); index++)
+        {
+            if (!rows.get(index).
+                    getElementsByTag("td").
+                    get(1).
+                    text().contains("Важно:")) break;
         }
 
-        int day = Integer.parseInt(s_date[0]);
-        int month = ParserUtil.getMonth(s_date[1]);
-        int year = Integer.parseInt(s_date[2]) + 2000; //подумать над годом
-
-        //System.out.println("Самое свежее последнее изменение: " + LocalDate.of(year, month, day));
-        //System.out.println("Дата для сравнения: " + LocalDate.now().minusMonths(months));
-
-        return LocalDate.of(year, month, day).isBefore(LocalDate.now().minusMonths(months));
+        return index;
     }
 
     @Override
     public boolean process(String[] keywords) {
-        System.out.println("processing...");
+        System.out.println("Обработка данных...");
+        logger.log(Level.FINE, "Обработка данных, согласно заданным ключевым словам");
 
-        filteredVacancies = vacancies.stream().filter(v -> v.containsKeyword(keywords)).collect(Collectors.toList());
+        filteredVacancies = vacancies.stream().filter(v -> v.containsKeywords(keywords)).collect(Collectors.toList());
 
         for (Vacancy vacancy : filteredVacancies) {
                 System.out.println(vacancy.toString());
             }
-
+        logger.log(Level.FINE, "Данные успешно обработаны");
         return true;
     }
 
     @Override
     public boolean save() {
-        System.out.println("save results...");
+        System.out.println("Сохранение результатов...");
+        logger.log(Level.FINE, "Сохранение результатов работы программы в файл");
 
         List<String> lines = filteredVacancies.stream().map(v -> v.toString()).collect(Collectors.toList());
         Path result = Paths.get("result.txt");
         try {
             Files.write(result, lines, Charset.forName("UTF-8"));
+            logger.log(Level.FINE, "Результаты успешно сохранены");
             return true;
         } catch (IOException e) {
             e.printStackTrace();
+            logger.log(Level.SEVERE, "При сохранении результатов возникла ошибка");
             return false;
         }
     }

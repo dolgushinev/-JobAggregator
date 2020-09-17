@@ -2,16 +2,16 @@ import java.time.LocalDateTime;
 
 public class Topic {
 
-    private LocalDateTime lastDate;
-    private String url; //подумать над типом данных URL
+    private LocalDateTime modifiedDate;
+    private String url;
 
-    public Topic(LocalDateTime lastDate, String url) {
-        this.lastDate = lastDate;
+    public Topic(LocalDateTime modifiedDate, String url) {
+        this.modifiedDate = modifiedDate;
         this.url = url;
     }
 
-    public LocalDateTime getLastDate() {
-        return lastDate;
+    public LocalDateTime getModifiedDate() {
+        return modifiedDate;
     }
 
     public String getUrl() {

@@ -43,40 +43,40 @@ public class ParserUtil {
 
         switch (month) {
             case "янв":
-                m_number = Month.JANUARY.getNumber();
+                m_number = 1;
                 break;
             case "фев":
-                m_number = Month.FEBRUARY.getNumber();
+                m_number = 2;
                 break;
             case "мар":
-                m_number = Month.MARCH.getNumber();
+                m_number = 3;
                 break;
             case "апр":
-                m_number = Month.APRIL.getNumber();
+                m_number = 4;
                 break;
             case "май":
-                m_number = Month.MAY.getNumber();
+                m_number = 5;
                 break;
             case "июн":
-                m_number = Month.JUNE.getNumber();
+                m_number = 6;
                 break;
             case "июл":
-                m_number = Month.JULY.getNumber();
+                m_number = 7;
                 break;
             case "авг":
-                m_number = Month.AUGUST.getNumber();
+                m_number = 8;
                 break;
             case "сен":
-                m_number = Month.SEPTEMBER.getNumber();
+                m_number = 9;
                 break;
             case "окт":
-                m_number = Month.OCTOBER.getNumber();
+                m_number = 10;
                 break;
             case "ноя":
-                m_number = Month.NOVEMBER.getNumber();
+                m_number = 11;
                 break;
             case "дек":
-                m_number = Month.DECEMBER.getNumber();
+                m_number = 12;
                 break;
             default:
                 m_number = 0;
