@@ -3,7 +3,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -161,7 +160,7 @@ public class ParserSQLru implements Parser {
 
         boolean isLastPage = modifiedDate.isBefore(LocalDateTime.now().minusMonths(months));
 
-        if(isLastPage) logger.log(Level.FINE, "Все необходимые страницы загружены");
+        if (isLastPage) logger.log(Level.FINE, "Все необходимые страницы загружены");
 
         return isLastPage;
     }
@@ -169,8 +168,7 @@ public class ParserSQLru implements Parser {
     private int getFirstTopicIndex(Elements rows) {
         int index = 0;
 
-        for (index = 1; index < rows.size(); index++)
-        {
+        for (index = 1; index < rows.size(); index++) {
             if (!rows.get(index).
                     getElementsByTag("td").
                     get(1).
@@ -188,8 +186,8 @@ public class ParserSQLru implements Parser {
         filteredVacancies = vacancies.stream().filter(v -> v.containsKeywords(keywords)).collect(Collectors.toList());
 
         for (Vacancy vacancy : filteredVacancies) {
-                System.out.println(vacancy.toString());
-            }
+            System.out.println(vacancy.toString());
+        }
         logger.log(Level.FINE, "Данные успешно обработаны");
         return true;
     }

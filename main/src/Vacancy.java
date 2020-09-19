@@ -15,14 +15,13 @@ public class Vacancy {
         this.url = url;
     }
 
-    public boolean containsKeywords(String[] keywords)
-    {
-        if(keywords.length == 0) return true;
+    public boolean containsKeywords(String[] keywords) {
+        if (keywords.length == 0) return true;
 
-        for (String keyword:keywords) {
+        for (String keyword : keywords) {
             Pattern pattern = Pattern.compile("\\b" + keyword + "\\b", Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(getDescription());
-            if(matcher.find()) return true;
+            if (matcher.find()) return true;
         }
 
         return false;
@@ -30,7 +29,7 @@ public class Vacancy {
 
     @Override
     public String toString() {
-        return  "Дата публикации=" + createdDate +
+        return "Дата публикации=" + createdDate +
                 ", Заголовок='" + title + '\'' +
                 ", URL='" + url + '\'' +
                 ", Описание='" + description + '\'';

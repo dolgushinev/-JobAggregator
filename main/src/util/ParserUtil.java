@@ -20,16 +20,14 @@ public class ParserUtil {
             day = LocalDate.now().getDayOfMonth();
             month = LocalDate.now().getMonthValue();
             year = LocalDate.now().getYear();
-        }
-        else if (date[0].equals("вчера")) {
+        } else if (date[0].equals("вчера")) {
             day = LocalDate.now().getDayOfMonth() - 1;
             month = LocalDate.now().getMonthValue();
             year = LocalDate.now().getYear();
-        }
-        else {
+        } else {
             day = Integer.parseInt(date[0]);
             month = getMonth(date[1]);
-            year = Integer.parseInt(date[2]) + 2000; //подумать над годом
+            year = Integer.parseInt(date[2]) + LocalDateTime.now().getYear() / 100 * 100;
         }
 
         minute = Integer.parseInt(time[0].trim());
