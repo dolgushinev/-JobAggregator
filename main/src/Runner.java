@@ -14,9 +14,10 @@ public class Runner {
             Parser parser = new ParserSQLru();
             if (args.length > 0)
                 input_months = Integer.parseInt(args[1].trim());
-            parser.load(input_months);
-            parser.process(keywords);
-            parser.save();
+            if(parser.load(input_months)) {
+                parser.process(keywords);
+                parser.save();
+            }
         } else {
             System.out.println("Входные параметры не валидны");
         }
@@ -28,10 +29,6 @@ public class Runner {
         else {
             String[] keywords = new String[args.length - 2];
             System.arraycopy(args, 2, keywords, 0, args.length - 2);
-            for (String keyword:keywords
-                 ) {
-                System.out.println(keyword);
-            }
 
             return Arrays.stream(keywords).map(s -> s.trim()).toArray(String[]::new);
         }

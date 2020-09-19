@@ -63,8 +63,8 @@ public class ParserSQLru implements Parser {
 
             String pageURL = baseURL + String.valueOf(i);
             System.out.println("Загружаем: " + pageURL);
-            doc = Jsoup.connect(baseURL + String.valueOf(i)).get();
 
+            doc = Jsoup.connect(baseURL + String.valueOf(i)).get();
             logger.log(Level.FINE, "Загружены данные по странице: " + baseURL + String.valueOf(i));
 
             while (!isLastPage(doc, months)) {
@@ -94,7 +94,7 @@ public class ParserSQLru implements Parser {
                         vacancyDoc = Jsoup.connect(topic.getUrl()).get();
                     } catch (IOException e) {
                         e.printStackTrace();
-                        logger.log(Level.SEVERE, "При загрузке данных топика возникла ошибка");
+                        logger.log(Level.SEVERE, "При загрузке данных топика возникла ошибка, проверьте работоспособность сети");
                     }
 
                     String createdDate = vacancyDoc.getElementsByClass("msgFooter").get(0).text().split("\\[")[0];
@@ -116,7 +116,7 @@ public class ParserSQLru implements Parser {
 
         } catch (IOException e) {
             e.printStackTrace();
-            logger.log(Level.SEVERE, "При загрузке данных возникла ошибка");
+            logger.log(Level.SEVERE, "При загрузке данных возникла ошибка, проверьте работоспособность сети");
             return false;
         }
 
@@ -185,23 +185,21 @@ public class ParserSQLru implements Parser {
 
         filteredVacancies = vacancies.stream().filter(v -> v.containsKeywords(keywords)).collect(Collectors.toList());
 
-        for (Vacancy vacancy : filteredVacancies) {
-            System.out.println(vacancy.toString());
-        }
         logger.log(Level.FINE, "Данные успешно обработаны");
         return true;
     }
 
     @Override
     public boolean save() {
-        System.out.println("Сохранение результатов...");
+        System.out.println("Сохранение результатов в файл result.txt...");
         logger.log(Level.FINE, "Сохранение результатов работы программы в файл");
 
         List<String> lines = filteredVacancies.stream().map(v -> v.toString()).collect(Collectors.toList());
         Path result = Paths.get("result.txt");
         try {
             Files.write(result, lines, Charset.forName("UTF-8"));
-            logger.log(Level.FINE, "Результаты успешно сохранены");
+            System.out.println("Результаты успешно сохранены в файл result.txt");
+            logger.log(Level.FINE, "Результаты успешно сохранены в файл result.txt");
             return true;
         } catch (IOException e) {
             e.printStackTrace();
