@@ -10,7 +10,6 @@ public interface Parser {
      * @return true, если данные по вакансиям успешно загружены
      */
     boolean load(int months);
-
     /**
      * Метод отвечающий за обработку списка вакансий, согласно указанным фильтрам.
      *
@@ -18,7 +17,6 @@ public interface Parser {
      * @return true, если фильтрация прошла успешно
      */
     boolean process(String[] keywords);
-
     /**
      * Метод отвечающий за сохранение отфильтрованного списка вакансий
      *
