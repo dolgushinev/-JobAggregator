@@ -20,7 +20,7 @@ public class Vacancy {
 
         for (String keyword : keywords) {
             Pattern pattern = Pattern.compile("\\b" + keyword + "\\b", Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(getDescription());
+            Matcher matcher = pattern.matcher(getTitle());
             if (matcher.find()) return true;
         }
 

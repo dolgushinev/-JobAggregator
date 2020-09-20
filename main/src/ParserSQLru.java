@@ -14,6 +14,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import util.Message;
 import util.ParserUtil;
 
 public class ParserSQLru implements Parser {
@@ -31,7 +32,7 @@ public class ParserSQLru implements Parser {
         try {
             LogManager.getLogManager().readConfiguration(ParserSQLru.class.getResourceAsStream("/logging.properties"));
         } catch (IOException e) {
-            System.err.println("Не смог загрузить файл конфигурации для логера: " + e.toString());
+            System.err.println(Message.LOGGER_CONFIG_LOADING_ERROR.getText() + "\n" + e.toString());
         }
 
         logger = Logger.getLogger(ParserSQLru.class.getName());
@@ -40,7 +41,7 @@ public class ParserSQLru implements Parser {
         try {
             handler = new FileHandler("./LogFile.log");
         } catch (IOException e) {
-            System.out.println("Проверьте, что есть доступ к файловой системе");
+            System.out.println(Message.CHECK_FILESYSTEM_ACCESS.getText());
         }
         logger.addHandler(handler);
 
@@ -51,9 +52,8 @@ public class ParserSQLru implements Parser {
 
     @Override
     public boolean load(int months) {
-
-        System.out.println("Загрузка данных...");
-        logger.log(Level.FINE, "Загрузка данных...");
+        System.out.println(Message.DATA_LOADING_STARTED.getText());
+        logger.log(Level.FINE, Message.DATA_LOADING_STARTED.getText());
 
         Document doc = null;
 
@@ -62,10 +62,10 @@ public class ParserSQLru implements Parser {
             int i = 1;
 
             String pageURL = baseURL + String.valueOf(i);
-            System.out.println("Загружаем: " + pageURL);
 
-            doc = Jsoup.connect(baseURL + String.valueOf(i)).get();
-            logger.log(Level.FINE, "Загружены данные по странице: " + baseURL + String.valueOf(i));
+            doc = Jsoup.connect(pageURL).get();
+            System.out.println(Message.PAGE_DATA_LOADED.getText() + pageURL);
+            logger.log(Level.FINE, Message.PAGE_DATA_LOADED.getText() + pageURL);
 
             while (!isLastPage(doc, months)) {
 
@@ -94,7 +94,9 @@ public class ParserSQLru implements Parser {
                         vacancyDoc = Jsoup.connect(topic.getUrl()).get();
                     } catch (IOException e) {
                         e.printStackTrace();
-                        logger.log(Level.SEVERE, "При загрузке данных топика возникла ошибка, проверьте работоспособность сети");
+                        System.out.println(Message.TOPIC_DATA_LOADING_ERROR.getText());
+                        logger.log(Level.SEVERE, Message.TOPIC_DATA_LOADING_ERROR.getText());
+
                     }
 
                     String createdDate = vacancyDoc.getElementsByClass("msgFooter").get(0).text().split("\\[")[0];
@@ -108,19 +110,22 @@ public class ParserSQLru implements Parser {
                 i++;
 
                 pageURL = baseURL + String.valueOf(i);
-                System.out.println("Загружаем: " + pageURL);
                 doc = Jsoup.connect(pageURL).get();
-                logger.log(Level.FINE, "Загружены данные по странице: " + baseURL + String.valueOf(i));
+                System.out.println(Message.PAGE_DATA_LOADED.getText() + pageURL);
+                logger.log(Level.FINE, Message.PAGE_DATA_LOADED.getText() + pageURL);
 
             }
 
         } catch (IOException e) {
             e.printStackTrace();
-            logger.log(Level.SEVERE, "При загрузке данных возникла ошибка, проверьте работоспособность сети");
+            System.out.println(Message.PAGE_DATA_LOADING_ERROR.getText());
+            logger.log(Level.SEVERE, Message.PAGE_DATA_LOADING_ERROR.getText());
             return false;
         }
 
-        logger.log(Level.FINE, "Загрузка данных успешно завершена");
+        System.out.println(Message.DATA_LOADING_COMPLETED.getText());
+        logger.log(Level.FINE, Message.DATA_LOADING_COMPLETED.getText());
+
         return true;
     }
 
@@ -158,11 +163,7 @@ public class ParserSQLru implements Parser {
 
         LocalDateTime modifiedDate = ParserUtil.getDate(date);
 
-        boolean isLastPage = modifiedDate.isBefore(LocalDateTime.now().minusMonths(months));
-
-        if (isLastPage) logger.log(Level.FINE, "Все необходимые страницы загружены");
-
-        return isLastPage;
+        return modifiedDate.isBefore(LocalDateTime.now().minusMonths(months));
     }
 
     private int getFirstTopicIndex(Elements rows) {
@@ -180,30 +181,31 @@ public class ParserSQLru implements Parser {
 
     @Override
     public boolean process(String[] keywords) {
-        System.out.println("Обработка данных...");
-        logger.log(Level.FINE, "Обработка данных, согласно заданным ключевым словам");
+        System.out.println(Message.DATA_PROCESSING_STARTED.getText());
+        logger.log(Level.FINE, Message.DATA_PROCESSING_STARTED.getText());
 
         filteredVacancies = vacancies.stream().filter(v -> v.containsKeywords(keywords)).collect(Collectors.toList());
-
-        logger.log(Level.FINE, "Данные успешно обработаны");
+        System.out.println(Message.DATA_PROCESSING_COMPLETED.getText());
+        logger.log(Level.FINE, Message.DATA_PROCESSING_COMPLETED.getText());
         return true;
     }
 
     @Override
     public boolean save() {
-        System.out.println("Сохранение результатов в файл result.txt...");
-        logger.log(Level.FINE, "Сохранение результатов работы программы в файл");
+        System.out.println(Message.SAVE_DATA_TO_FILE_STARTED.getText());
+        logger.log(Level.FINE, Message.SAVE_DATA_TO_FILE_STARTED.getText());
 
         List<String> lines = filteredVacancies.stream().map(v -> v.toString()).collect(Collectors.toList());
         Path result = Paths.get("result.txt");
         try {
             Files.write(result, lines, Charset.forName("UTF-8"));
-            System.out.println("Результаты успешно сохранены в файл result.txt");
-            logger.log(Level.FINE, "Результаты успешно сохранены в файл result.txt");
+            System.out.println(Message.SAVE_DATA_TO_FILE_COMPLETED.getText());
+            logger.log(Level.FINE, Message.SAVE_DATA_TO_FILE_COMPLETED.getText());
             return true;
         } catch (IOException e) {
             e.printStackTrace();
-            logger.log(Level.SEVERE, "При сохранении результатов возникла ошибка");
+            System.out.println(Message.SAVE_DATA_TO_FILE_ERROR.getText());
+            logger.log(Level.SEVERE, Message.SAVE_DATA_TO_FILE_ERROR.getText());
             return false;
         }
     }
