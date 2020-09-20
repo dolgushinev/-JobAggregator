@@ -1,8 +1,6 @@
 package util;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 /**
  * ParserUtil - вспомогательный класс, содержащий методы для обработки дат и месяцев
  */
@@ -14,16 +12,13 @@ public class ParserUtil {
      * @return true, дата и время в виде LocalDateTime
      */
     public static LocalDateTime getDate(String datetime) {
-
         int day = 0;
         int month = 0;
         int year = 0;
         int minute = 0;
         int second = 0;
-
         String[] date = datetime.split(",")[0].split(" ");
         String[] time = datetime.split(",")[1].split(":");
-
         if (date[0].equals("сегодня")) {
             day = LocalDate.now().getDayOfMonth();
             month = LocalDate.now().getMonthValue();
@@ -37,13 +32,10 @@ public class ParserUtil {
             month = getMonth(date[1]);
             year = Integer.parseInt(date[2]) + LocalDateTime.now().getYear() / 100 * 100;
         }
-
         minute = Integer.parseInt(time[0].trim());
         second = Integer.parseInt(time[1].trim());
-
         return LocalDateTime.of(year, month, day, minute, second);
     }
-
     /**
      * Метод, отвечающий за преобразование имени месяца в его номер
      *
@@ -52,7 +44,6 @@ public class ParserUtil {
      */
     public static int getMonth(String month) {
         int m_number = 0;
-
         switch (month) {
             case "янв":
                 m_number = 1;
@@ -92,11 +83,7 @@ public class ParserUtil {
                 break;
             default:
                 m_number = 0;
-
         }
-
         return m_number;
-
     }
-
 }

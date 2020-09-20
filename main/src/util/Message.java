@@ -1,5 +1,4 @@
 package util;
-
 public enum Message {
     LOGGER_CONFIG_LOADING_ERROR("Не смог загрузить файл конфигурации для логера: "),
     CHECK_FILESYSTEM_ACCESS("Проверьте, что есть доступ к файловой системе"),
@@ -14,11 +13,9 @@ public enum Message {
     SAVE_DATA_TO_FILE_COMPLETED("Результаты успешно сохранены"),
     SAVE_DATA_TO_FILE_ERROR("При сохранении результатов возникла ошибка"),
     INPUT_PARAM_IS_NOT_VALID("Входные параметры не валидны");
-
     private String text;
     Message(String text){
         this.text = text;
     }
     public String getText(){ return text;}
-
 }
