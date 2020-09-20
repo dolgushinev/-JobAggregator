@@ -3,8 +3,16 @@ package util;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * ParserUtil - вспомогательный класс, содержащий методы для обработки дат и месяцев
+ */
 public class ParserUtil {
-
+    /**
+     * Метод отвечающий за преобразование даты в формате сайта sql.ru в LocalDateTime
+     *
+     * @param datetime строка, содержащая дату и время в формате, используемом на сайте sql.ru
+     * @return true, дата и время в виде LocalDateTime
+     */
     public static LocalDateTime getDate(String datetime) {
 
         int day = 0;
@@ -36,6 +44,12 @@ public class ParserUtil {
         return LocalDateTime.of(year, month, day, minute, second);
     }
 
+    /**
+     * Метод, отвечающий за преобразование имени месяца в его номер
+     *
+     * @param month имя месяца
+     * @return номер месяца
+     */
     public static int getMonth(String month) {
         int m_number = 0;
 

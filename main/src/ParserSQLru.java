@@ -17,6 +17,11 @@ import org.jsoup.select.Elements;
 import util.Message;
 import util.ParserUtil;
 
+/**
+ * ParserSQLru - класс, отвечающий за загрузку, обработку и сохранение вакансий с сайта sql.ru
+ * за указанный период и согласно указанным фильтрам
+ */
+
 public class ParserSQLru implements Parser {
 
     private List<Vacancy> vacancies;
@@ -49,6 +54,13 @@ public class ParserSQLru implements Parser {
         handler.setFormatter(formatter);
 
     }
+
+    /**
+     * Метод отвечает за загрузку вакансий за указанный период
+     *
+     * @param months количество месяцев за которые необходимо загрузить вакансии.
+     * @return true если загрузка прошла успешно
+     */
 
     @Override
     public boolean load(int months) {
@@ -129,24 +141,54 @@ public class ParserSQLru implements Parser {
         return true;
     }
 
+    /**
+     * Метод отвечает за определение - закрыт топик или нет
+     *
+     * @param currentRow строка таблицы, содержащая информацию по топику
+     * @return true если в строке таблицы есть элемент с className = closedTopic
+     */
     private boolean isClosed(Element currentRow) {
         return !currentRow.getElementsByTag("td").get(1).
                 getElementsByClass("closedTopic").isEmpty();
     }
 
+    /**
+     * Метод отвечает за получение URL топика
+     *
+     * @param currentRow строка таблицы, содержащая информацию по топику
+     * @return строка, содержащая URL топика
+     */
     private String getURL(Element currentRow) {
         return currentRow.getElementsByTag("td").get(1).getElementsByTag("a").first().attributes().get("href");
     }
 
+    /**
+     * Метод отвечает за получение заголовок вакансии
+     *
+     * @param vacancyDoc документ, содержащий первое сообщение по вакансии
+     * @return строка, содержащая заголовок вакансии
+     */
     private String getTitle(Document vacancyDoc) {
         return vacancyDoc.getElementsByClass("messageHeader").first().text();
     }
 
+    /**
+     * Метод отвечает за получение описания вакансии
+     *
+     * @param vacancyDoc документ, содержащий первое сообщение по вакансии
+     * @return строка, содержащая описание вакансии
+     */
     private String getDescription(Document vacancyDoc) {
 
         return vacancyDoc.getElementsByClass("msgTable").first().getElementsByClass("msgBody").get(1).text();
     }
 
+    /**
+     * Метод отвечает за определение - нужно ли продолжать загрузку страниц с топиками
+     *
+     * @param doc документ, содержащий таблицу топиков
+     * @return true, если больше загружать страницы с таблицей топиков нет необходимости
+     */
     private boolean isLastPage(Document doc, int months) {
 
         Elements rows = doc.getElementsByTag("table").
@@ -166,6 +208,12 @@ public class ParserSQLru implements Parser {
         return modifiedDate.isBefore(LocalDateTime.now().minusMonths(months));
     }
 
+    /**
+     * Метод отвечает за получение индекса первого топика в таблице топиков без пометки "Важно: "
+     *
+     * @param rows список строк таблицы топиков
+     * @return index, индекс первого топика, не содержащего пометку "Важно: "
+     */
     private int getFirstTopicIndex(Elements rows) {
         int index = 0;
 
@@ -179,6 +227,13 @@ public class ParserSQLru implements Parser {
         return index;
     }
 
+    /**
+     * Метод отвечающий за обработку списка вакансий, согласно указанным фильтрам.
+     * Результат сохраняется в filteredVacancies
+     *
+     * @param keywords список ключевых слов
+     * @return true, если фильтрация прошла успешно
+     */
     @Override
     public boolean process(String[] keywords) {
         System.out.println(Message.DATA_PROCESSING_STARTED.getText());
@@ -190,6 +245,12 @@ public class ParserSQLru implements Parser {
         return true;
     }
 
+    /**
+     * Метод отвечающий за сохранение отфильтрованного списка вакансий
+     * Результат сохраняется в файл result.txt
+     *
+     * @return true, если сохранение в файл успешно
+     */
     @Override
     public boolean save() {
         System.out.println(Message.SAVE_DATA_TO_FILE_STARTED.getText());

@@ -1,5 +1,10 @@
+import util.Message;
+
 import java.util.Arrays;
 
+/**
+ * Класс, отвечающий за запуск приложения и валидацию входных параметров
+ */
 public class Runner {
 
     public static void main(String[] args) {
@@ -14,15 +19,21 @@ public class Runner {
             Parser parser = new ParserSQLru();
             if (args.length > 0)
                 input_months = Integer.parseInt(args[1].trim());
-            if(parser.load(input_months)) {
+            if (parser.load(input_months)) {
                 parser.process(keywords);
                 parser.save();
             }
         } else {
-            System.out.println("Входные параметры не валидны");
+            System.out.println(Message.INPUT_PARAM_IS_NOT_VALID.getText());
         }
     }
 
+    /**
+     * Метод отвечающий за получение и валидацию списка ключевых слов
+     *
+     * @param args массив входных параметров
+     * @return массив ключевых слов
+     */
     private static String[] getKeywords(String[] args) {
 
         if (args.length <= 2) return new String[]{};
@@ -34,6 +45,12 @@ public class Runner {
         }
     }
 
+    /**
+     * Метод отвечающий за валидацию входных параметров - сайта и количества месяцев
+     *
+     * @param args массив входных параметров
+     * @return true, если валидация прошла успешно
+     */
     private static boolean validateInputParam(String[] args) {
 
         if (args.length == 0)
@@ -57,6 +74,12 @@ public class Runner {
         return true;
     }
 
+    /**
+     * Метод отвечающий за проверку - является ли значение строковой переменной числом
+     *
+     * @param s входная строка
+     * @return true, если значение строковой переменной является числом
+     */
     private static boolean isDigit(String s) throws NumberFormatException {
         try {
             Integer.parseInt(s);

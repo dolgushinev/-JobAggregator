@@ -2,6 +2,9 @@ import java.time.LocalDateTime;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Класс, отвечающий за хранение данных по вакансиям
+ */
 public class Vacancy {
     private String title;
     private String description;
@@ -15,6 +18,12 @@ public class Vacancy {
         this.url = url;
     }
 
+    /**
+     * Метод отвечающий за определение содержит ли заголовок вакансии хотя бы одно ключевое слово
+     *
+     * @param keywords массив ключевых слов
+     * @return true, если заголовок вакансии содержит хотя бы одно ключевое слово
+     */
     public boolean containsKeywords(String[] keywords) {
         if (keywords.length == 0) return true;
 
