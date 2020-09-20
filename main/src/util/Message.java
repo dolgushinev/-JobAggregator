@@ -12,18 +12,13 @@ public enum Message {
     DATA_PROCESSING_COMPLETED("Данные успешно обработаны"),
     SAVE_DATA_TO_FILE_STARTED("Сохранение результатов в файл result.txt..."),
     SAVE_DATA_TO_FILE_COMPLETED("Результаты успешно сохранены"),
-    SAVE_DATA_TO_FILE_ERROR("При сохранении результатов возникла ошибка")
-
-
-    ;
-
+    SAVE_DATA_TO_FILE_ERROR("При сохранении результатов возникла ошибка"),
+    INPUT_PARAM_IS_NOT_VALID("Входные параметры не валидны");
 
     private String text;
     Message(String text){
         this.text = text;
     }
     public String getText(){ return text;}
-
-
 
 }

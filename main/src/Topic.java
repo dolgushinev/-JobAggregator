@@ -1,5 +1,8 @@
 import java.time.LocalDateTime;
 
+/**
+ * Класс, отвечающий за хранение промежуточных результатов при поиске необходимых вакансий
+ */
 public class Topic {
 
     private LocalDateTime modifiedDate;
